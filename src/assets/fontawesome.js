@@ -12,6 +12,14 @@ import {
   faListUl,
   faFileAlt,
   faListAlt,
+  faChartLine,
+  faCodeBranch,
+  faFolderTree,
+  faSliders,
+  faClockRotateLeft,
+  faServer,
+  faGear,
+  faFolderOpen,
 } from '@fortawesome/free-solid-svg-icons'
 
 library.add(
@@ -26,4 +34,12 @@ library.add(
   faListUl,
   faFileAlt,
   faListAlt
+  ,faChartLine,
+  faCodeBranch,
+  faFolderTree,
+  faSliders,
+  faClockRotateLeft,
+  faServer,
+  faGear,
+  faFolderOpen
 )

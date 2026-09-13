@@ -10,9 +10,10 @@
 </template>
 
 <script>
-import Prism from '../prismjs'
+import Prism from '../assets/prismjs'
 
 export default {
+  compatConfig: { MODE: 3 },
   props: {
     lang: {
       type: String,

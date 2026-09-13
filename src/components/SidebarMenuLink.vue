@@ -2,7 +2,7 @@
   <a v-if="isHyperLink" v-bind="$attrs">
     <slot />
   </a>
-  <router-link v-else v-slot="{ href, navigate }" custom :to="$attrs.href">
+  <router-link v-else v-slot="{ href, navigate }" custom :to="props.item.href || ''">
     <a v-bind="$attrs" :href="href" @click="navigate">
       <slot />
     </a>

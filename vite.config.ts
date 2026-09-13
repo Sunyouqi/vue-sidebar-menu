@@ -1,35 +1,14 @@
 import vue from '@vitejs/plugin-vue'
 import { defineConfig } from 'vite'
-import pkg from './package.json'
+//import basicssl from '@vitejs/plugin-basic-ssl'
 
 export default defineConfig({
   plugins: [vue()],
-  build: {
-    lib: {
-      entry: ['src/index.js'],
-      name: 'VueSidebarMenu',
-      formats: ['es', 'umd', 'iife'],
-      fileName: (format) => {
-        const { main, module, unpkg, name } = pkg
-        const file: Record<string, string | undefined> = {
-          umd: main.split('/').pop(),
-          es: module.split('/').pop(),
-          iife: unpkg.split('/').pop(),
-        }
-        return file[format] || `${name}.${format}.js`
-      },
-      cssFileName: 'vue-sidebar-menu',
-    },
-    outDir: 'dist',
-    sourcemap: true,
-    rollupOptions: {
-      external: ['vue'],
-      output: {
-        exports: 'named',
-        globals: {
-          vue: 'Vue',
-        },
-      },
-    },
+  server: {
+    host: "0.0.0.0",
+  },
+  resolve: {
+    alias: { vue: 'vue/dist/vue.esm-bundler.js' },
+    dedupe: ['vue'],
   },
 })

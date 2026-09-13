@@ -1,30 +1,18 @@
 <template>
-  <div
-    ref="sidebarRef"
-    :class="sidebarClass"
-    :style="{ 'max-width': sidebarWidth }"
-  >
+  <div ref="sidebarRef" :class="sidebarClass" :style="{ 'max-width': sidebarWidth }">
     <div class="vsm--wrapper">
       <slot name="header" />
       <sidebar-menu-scroll>
         <ul class="vsm--menu" :style="{ width: sidebarWidth }">
-          <sidebar-menu-item
-            v-for="item in computedMenu"
-            :key="item.id"
-            :item="item"
-            :level="1"
-            :active-show="activeShow"
-            @update-active-show="updateActiveShow"
-          >
-            <template
-              #dropdown-icon="{
-                isOpen,
-                toggle,
-              }: {
-                isOpen: boolean,
-                toggle: (event: Event) => void,
-              }"
-            >
+          <sidebar-menu-item v-for="item in computedMenu" :key="item.id" :item="item" :level="1"
+            :active-show="activeShow" @update-active-show="updateActiveShow">
+            <template #dropdown-icon="{
+              isOpen,
+              toggle,
+            }: {
+              isOpen: boolean,
+              toggle: (event: Event) => void,
+            }">
               <slot name="dropdown-icon" v-bind="{ isOpen, toggle }">
                 <span class="vsm--arrow_default" />
               </slot>
@@ -35,24 +23,14 @@
       <slot name="footer" />
     </div>
 
-    <button
-      v-if="!hideToggle"
-      class="vsm--toggle-btn"
-      :aria-label="collapsed ? 'Expand sidebar' : 'Collapse sidebar'"
-      @click="onToggleClick"
-    >
+    <button v-if="!hideToggle" class="vsm--toggle-btn" :aria-label="collapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+      @click="onToggleClick">
       <slot name="toggle-icon">
         <span class="vsm--toggle-btn_default" />
       </slot>
     </button>
   </div>
 </template>
-
-<script lang="ts">
-export default {
-  compatConfig: { MODE: 3 },
-}
-</script>
 
 <script setup lang="ts">
 import {
@@ -69,18 +47,28 @@ import {
 import SidebarMenuItem from './SidebarMenuItem.vue'
 import SidebarMenuScroll from './SidebarMenuScroll.vue'
 import type {
-  SidebarMenuProps,
-  SidebarMenuEmits,
   SidebarItem,
   MobileItem,
   MobileItemRect,
   SidebarItemType,
+  SidebarMenuProps,
+  SidebarMenuEmits,
 } from '../types'
 import { useProvideSidebar } from '../use/useSidebar'
 
 const props = withDefaults(defineProps<SidebarMenuProps>(), {
-  width: '290px',
+  collapsed: false,
+  width: '210px',
   widthCollapsed: '65px',
+  showOneChild: false,
+  showChild: false,
+  rtl: false,
+  relative: false,
+  hideToggle: false,
+  theme: '',
+  disableHover: false,
+  linkComponentName: 'a',
+  smoothScroll: false,
 })
 const emit = defineEmits<SidebarMenuEmits>()
 
@@ -143,7 +131,7 @@ const updateMobileItem = (item: SidebarItem | null) => {
 
 const updateMobileItemRect = (rect: MobileItemRect) => {
   for (const key in rect) {
-    ;(mobileItem.rect as any)[key] = rect[key as keyof MobileItemRect]
+    ; (mobileItem.rect as any)[key] = rect[key as keyof MobileItemRect]
   }
 }
 

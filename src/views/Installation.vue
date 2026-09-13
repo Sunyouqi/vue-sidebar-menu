@@ -7,7 +7,7 @@
     </prism-code>
     <p>Import the plugin globally</p>
     <prism-code lang="js">
-      {{
+    {{
         `import { createApp } from 'vue'
 import App from './App.vue'
 import VueSidebarMenu from 'vue-sidebar-menu'
