@@ -100,9 +100,9 @@ const searchModel = computed({
       <v-card class="panel repository-panel" elevation="0">
         <div class="panel-title">
           <div>
-            <h2>Script repository</h2>
+            <h2>文件仓库</h2>
             <p>Browse pytest, YAML and XML automation assets</p>
-          </div><v-btn variant="text" color="primary" size="small" @click="emit('navigate', 'Script repository')">View
+          </div><v-btn variant="text" color="primary" size="small" @click="emit('navigate', '文件仓库')">View
             repository <v-icon icon="mdi-arrow-right" /></v-btn>
         </div>
         <div class="repo-toolbar"><v-text-field v-model="searchModel" density="compact" variant="outlined" hide-details
@@ -120,7 +120,7 @@ const searchModel = computed({
           <div>
             <h2>Recent runs</h2>
             <p>Latest activity from your workspace</p>
-          </div><v-btn variant="text" color="primary" size="small" @click="emit('navigate', 'Run history')">View all
+          </div><v-btn variant="text" color="primary" size="small" @click="emit('navigate', '执行历史')">View all
             <v-icon icon="mdi-arrow-right" /></v-btn>
         </div>
         <div class="run-list">

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<topology>
+  <device id="switch-1" type="switch" x="-109.46470809190816" y="20.463561371200072" name="Core Switch" ip="10.0.0.10" protocolPort="22" username="admin" password="">
+    <port name="Port 2" speed="1G" pid="2" side="right" />
+  </device>
+  <device id="testcenter-1" type="testcenter" x="397.22905295734705" y="-7.703970652373471" name="Spirent TestCenter" ip="10.0.0.20" version="5.50">
+    <port name="Port 1" speed="1G" pid="1" side="left" />
+    <port name="Port 2" speed="1G" pid="2" side="left" />
+    <port name="Port 3" speed="1G" pid="3" side="right" />
+  </device>
+  <device id="switch-1789493607307" type="switch" x="-87.97738521306377" y="431.27909824002694" name="New Switch" ip="" protocolPort="22" username="" password="">
+    <port name="Port 1" speed="1G" pid="1" side="right" />
+  </device>
+  <device id="switch-1789493640425" type="switch" x="767.0262302542517" y="215.11565595483665" name="New Switch" ip="" protocolPort="22" username="" password="">
+    <port name="Port 1" speed="1G" pid="1" side="left" />
+  </device></topology>

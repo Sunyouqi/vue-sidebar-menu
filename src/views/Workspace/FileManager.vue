@@ -35,7 +35,7 @@ function handleConfigure(node: AutomationNode) {
     <div class="session-heading">
       <div>
         <div class="eyebrow">WORKSPACE SESSION</div>
-        <h1>File manager</h1>
+        <h1>脚本管理/执行</h1>
         <v-btn color="primary" variant="tonal" prepend-icon="mdi-tune-variant"
           @click="openConfigureDialog()">Configure</v-btn>
         <br />

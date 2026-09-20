@@ -3,7 +3,7 @@
     <div class="session-heading">
       <div>
         <div class="eyebrow">WORKSPACE SESSION</div>
-        <h1>Team settings</h1>
+        <h1>团队配置</h1>
         <p></p>
       </div>
     </div>

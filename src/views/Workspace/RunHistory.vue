@@ -11,7 +11,7 @@ defineProps<{
     <div class="session-heading">
       <div>
         <div class="eyebrow">WORKSPACE SESSION</div>
-        <h1>Run history</h1>
+        <h1>执行历史</h1>
         <p></p>
       </div>
     </div>
@@ -28,7 +28,7 @@ defineProps<{
           <div class="history-head"><span>TEST
               SCRIPT</span><span>TARGET</span><span>DURATION</span><span>STATUS</span><span>WHEN</span></div>
           <div v-for="run in runs" :key="run.script + run.time" class="history-row"><strong>{{ run.script
-          }}</strong><span>{{ run.target }}</span><span>{{ run.duration }}</span><v-chip size="x-small"
+              }}</strong><span>{{ run.target }}</span><span>{{ run.duration }}</span><v-chip size="x-small"
               :color="run.status === 'Passed' ? 'success' : 'warning'" variant="tonal">{{ run.status
               }}</v-chip><time>{{
                 run.time }}</time></div>

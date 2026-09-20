@@ -16,7 +16,7 @@ function runPlan(script: string) {
     <div class="session-heading">
       <div>
         <div class="eyebrow">WORKSPACE SESSION</div>
-        <h1>Test plans</h1>
+        <h1>测试计划</h1>
         <p></p>
       </div>
       <v-btn color="primary" prepend-icon="mdi-plus" elevation="0" @click="emit('open-preset')"></v-btn>
@@ -30,8 +30,8 @@ function runPlan(script: string) {
         <h2>{{ plan.name }}</h2>
         <p>{{ plan.script }}</p>
         <div class="plan-meta"><span><v-icon icon="mdi-server-outline" size="14" />{{ plan.target
-        }}</span><span><v-icon icon="mdi-calendar-clock" size="14" />{{ plan.schedule }}</span></div><v-btn
-          block color="primary" variant="tonal" @click="runPlan(plan.script)">Run
+            }}</span><span><v-icon icon="mdi-calendar-clock" size="14" />{{ plan.schedule }}</span></div><v-btn block
+          color="primary" variant="tonal" @click="runPlan(plan.script)">Run
           plan</v-btn>
       </v-card>
     </div>

@@ -7,3 +7,4 @@ export interface AutomationNode {
   expanded: boolean
   file?: File
 }
+

@@ -28,7 +28,7 @@ const searchModel = computed({
     <div class="session-heading">
       <div>
         <div class="eyebrow">WORKSPACE SESSION</div>
-        <h1>Script repository</h1>
+        <h1>文件仓库</h1>
         <p></p>
       </div>
       <v-btn color="primary" prepend-icon="mdi-plus" elevation="0" @click="emit('open-preset')"></v-btn>
@@ -47,7 +47,7 @@ const searchModel = computed({
             :class="{ selected: selectedScript === file.name }" @click="emit('update:selected-script', file.name)"><span
               class="file-type" :class="file.type">{{ file.type === 'pytest' ? 'PY' : file.type.toUpperCase()
               }}</span><span class="file-copy"><strong>{{ file.name }}</strong><small>{{ file.description
-              }}</small></span><v-chip size="x-small" :color="file.status === 'draft' ? 'warning' : 'success'"
+                }}</small></span><v-chip size="x-small" :color="file.status === 'draft' ? 'warning' : 'success'"
               variant="tonal">{{ file.status }}</v-chip><v-icon icon="mdi-chevron-right" size="18"
               color="grey" /></button></div>
       </v-card>

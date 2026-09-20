@@ -2,6 +2,7 @@
 import AutomationFileTree from './AutomationFileTree.vue'
 import type { AutomationNode } from '../types'
 
+
 defineProps<{
   nodes: AutomationNode[]
   darkMode?: boolean
@@ -18,8 +19,8 @@ const emit = defineEmits<{
   <AutomationFileTree
     :nodes="nodes"
     :dark-mode="darkMode"
-    @upload="emit('upload', $event)"
     @configure="emit('configure', $event)"
     @execute="emit('execute', $event)"
   />
 </template>
+//@upload="emit('upload', $event)"

@@ -17,7 +17,7 @@ import TeamSettings from './views/Resources/TeamSettings.vue'
 
 const collapsed = ref(false)
 const isOnMobile = ref(false)
-const activeView = ref('Dashboard')
+const activeView = ref('数据看板')
 const selectedScript = ref('tests/bgp_convergence.py')
 const search = ref('')
 const runnerState = ref<'ready' | 'running' | 'passed'>('ready')
@@ -36,15 +36,15 @@ const icon = (name: string) => ({
 })
 
 const menu = ref<SidebarMenuProps['menu']>([
-  { header: 'WORKSPACE', hiddenOnCollapse: true },
-  { title: 'Dashboard', href: '#/', icon: icon('fa-solid fa-chart-line') },
-  { title: 'Script repository', href: '#/repository', icon: icon('fa-solid fa-code-branch'), badge: { text: '24', class: 'vsm--badge_default' } },
-  { title: 'File manager', href: '#/files', icon: icon('fa-solid fa-folder-tree') },
-  { title: 'Test plans', href: '#/plans', icon: icon('fa-solid fa-sliders') },
-  { title: 'Run history', href: '#/history', icon: icon('fa-solid fa-clock-rotate-left') },
-  { header: 'RESOURCES', hiddenOnCollapse: true },
-  { title: 'Environments', href: '#/environments', icon: icon('fa-solid fa-server') },
-  { title: 'Team settings', href: '#/settings', icon: icon('fa-solid fa-gear') },
+  { header: 'WORKSPACE', hiddenOnCollapse: true, class: "workspace_header" },
+  { title: '数据看板', href: '#/', icon: icon('fa-solid fa-chart-line') },
+  { title: '文件仓库', href: '#/repository', icon: icon('fa-solid fa-code-branch'), badge: { text: '24', class: 'vsm--badge_default' } },
+  { title: '脚本管理/执行', href: '#/files', icon: icon('fa-solid fa-folder-tree') },
+  { title: '测试计划', href: '#/plans', icon: icon('fa-solid fa-sliders') },
+  { title: '执行历史', href: '#/history', icon: icon('fa-solid fa-clock-rotate-left') },
+  { header: 'RESOURCES', hiddenOnCollapse: true, class: "resource_header" },
+  { title: '环境配置', href: '#/environments', icon: icon('fa-solid fa-server') },
+  { title: '团队配置', href: '#/settings', icon: icon('fa-solid fa-gear') },
 ])
 
 const files: ScriptFile[] = [
@@ -72,7 +72,7 @@ const weeklyRunStats = ref<WeeklyRunStat[]>([
 
 const filteredFiles = computed(() => files.filter((file) => file.name.toLowerCase().includes(search.value.toLowerCase())))
 const selectedFile = computed(() => files.find((file) => file.name === selectedScript.value) ?? files[0])
-const breadcrumbSection = computed(() => ['Environments', 'Team settings'].includes(activeView.value) ? 'Resources' : 'Workspace')
+const breadcrumbSection = computed(() => ['环境配置', '团队配置'].includes(activeView.value) ? 'Resources' : 'Workspace')
 const currentDateLabel = computed(() => new Intl.DateTimeFormat('en-US', {
   weekday: 'long',
   month: 'long',
@@ -94,7 +94,7 @@ function runPlan() {
 }
 
 function onItemClick(_event: Event, item: SidebarItem) {
-  activeView.value = item.title ?? 'Dashboard'
+  activeView.value = item.title ?? '数据看板'
 }
 
 function configureNode(node: AutomationNode) {
@@ -155,22 +155,22 @@ onUnmounted(() => {
       </header>
 
       <main class="content">
-        <Dashboard v-if="activeView === 'Dashboard'" v-model:selected-script="selectedScript"
+        <Dashboard v-if="activeView === '数据看板'" v-model:selected-script="selectedScript"
           v-model:selected-environment="selectedEnvironment" v-model:selected-branch="selectedBranch"
           v-model:target="target" v-model:search="search" :current-date-label="currentDateLabel"
           :runner-state="runnerState" :weekly-run-stats="weeklyRunStats" :files="files" :filtered-files="filteredFiles"
           :runs="runs" :selected-file="selectedFile" @run-plan="runPlan" @navigate="activeView = $event"
           @open-preset="presetDialog = true" />
-        <ScriptRepository v-else-if="activeView === 'Script repository'" v-model:selected-script="selectedScript"
+        <ScriptRepository v-else-if="activeView === '文件仓库'" v-model:selected-script="selectedScript"
           v-model:search="search" :filtered-files="filteredFiles" :selected-file="selectedFile"
           :selected-branch="selectedBranch" @run-plan="runPlan" @open-preset="presetDialog = true" />
-        <FileManager v-else-if="activeView === 'File manager'" :uploaded-tree="uploadedTree" :dark-mode="darkMode"
+        <FileManager v-else-if="activeView === '脚本管理/执行'" :uploaded-tree="uploadedTree" :dark-mode="darkMode"
           @upload="handleTreeUpload" @configure="configureNode" @execute="executeNode" />
-        <TestPlans v-else-if="activeView === 'Test plans'" @run-plan="runPlan"
+        <TestPlans v-else-if="activeView === '测试计划'" @run-plan="runPlan"
           @update:selected-script="selectedScript = $event" @open-preset="presetDialog = true" />
-        <RunHistory v-else-if="activeView === 'Run history'" :runs="runs" />
-        <Environments v-else-if="activeView === 'Environments'" />
-        <TeamSettings v-else-if="activeView === 'Team settings'" />
+        <RunHistory v-else-if="activeView === '执行历史'" :runs="runs" />
+        <Environments v-else-if="activeView === '环境配置'" />
+        <TeamSettings v-else-if="activeView === '团队配置'" />
       </main>
     </div>
 
@@ -179,5 +179,13 @@ onUnmounted(() => {
 
 <style lang="scss">
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&display=swap');
-@import './assets/main.css'
+@import './assets/main.css';
+
+.workspace_header {
+  font-size: 10px !important;
+}
+
+.resource_header {
+  font-size: 10px !important;
+}
 </style>

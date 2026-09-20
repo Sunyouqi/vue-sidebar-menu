@@ -5,6 +5,46 @@ import '@he-tree/vue/style/material-design.css'
 import { Draggable, OpenIcon } from '@he-tree/vue'
 import type { AutomationNode } from '../types'
 
+
+const message = ref('')
+
+const postResponse = ref('')
+
+const BACKEND_URL = 'http://192.168.51.5:5000/api'
+
+// NATIVE FETCH: GET Request
+async function fetchMessage(node: AutomationNode) {
+  try {
+    const response = await fetch(`${BACKEND_URL}/data`)
+    if (!response.ok) throw new Error('Network response error')
+
+    const data = await response.json()
+    message.value = data.message
+  } catch (error) {
+    console.error('Error fetching data:', error)
+  }
+}
+
+// NATIVE FETCH: POST Request
+async function sendExecutable(node: AutomationNode) {
+  try {
+    const response = await fetch(`${BACKEND_URL}/submit`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json' // Tells Flask to expect JSON
+      },
+      body: JSON.stringify({ username: node.name }) // Must stringify the body
+    })
+
+    if (!response.ok) throw new Error('Network response error')
+
+    const data = await response.json()
+    postResponse.value = data.message
+  } catch (error) {
+    console.error('Error sending data:', error)
+  }
+}
+
 const props = withDefaults(defineProps<{ nodes: AutomationNode[]; depth?: number; darkMode?: boolean }>(), {
   depth: 0,
   darkMode: false,
@@ -80,29 +120,8 @@ function openUploadDialog() {
   uploadInput.value.click()
 }
 
-/* function addFile(node: AutomationNode) {
-  node.children.push({
-    id: `${node.path}/new-test.py`,
-    name: 'new-test.py',
-    path: `${node.path}/new-test.py`,
-    kind: 'file',
-    children: [],
-    expanded: false,
-  })
-}
-
-function addFolder(node: AutomationNode) {
-  node.children.push({
-    id: `${node.path}/new-folder`,
-    name: 'new-folder',
-    path: `${node.path}/new-folder`,
-    kind: 'folder',
-    children: [],
-    expanded: true,
-  })
-} */
-
-function executePython(node: AutomationNode) {
+async function executePython(node: AutomationNode) {
+  await sendExecutable(node)
   emit('execute', node)
 }
 
@@ -147,12 +166,21 @@ function executePython(node: AutomationNode) {
             prepend-icon="mdi-play" size="small" color="success" variant="outlined" aria-label="Execute Python script"
             @click.stop="executePython(stat.data)">Run</v-btn>
         </div>
+
       </template>
     </Draggable>
   </section>
+  <br /><br />
+  <span class="execution_result">Execution Result: {{ postResponse }}</span>
 </template>
 
 <style scoped>
+.execution_result {
+  padding-left: 80px;
+  -moz-user-select: none;
+  user-select: none;
+}
+
 .tree-shell {
   --tree-surface: #fff;
   --tree-border: #e6e8ef;
