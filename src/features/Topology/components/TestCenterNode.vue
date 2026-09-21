@@ -21,11 +21,20 @@ interface TestCenterData {
 const props = defineProps<NodeProps<TestCenterData>>()
 const emit = defineEmits<{
   (event: 'port-dblclick', port: Port): void
-  (event: 'port-contextmenu', port: Port, mouseEvent: MouseEvent, nodeId: string): void
+  (
+    event: 'port-contextmenu',
+    port: Port,
+    mouseEvent: MouseEvent,
+    nodeId: string
+  ): void
 }>()
-const leftPorts = computed(() => (props.data.interfaces ?? []).filter((interfaces) => interfaces.side === 'left'))
-const rightPorts = computed(() => (props.data.interfaces ?? []).filter((interfaces) => interfaces.side !== 'left'))
-const portStyle = (index: number) => ({ top: `${24 + index * 25}px` })
+const leftPorts = computed(() =>
+  (props.data.interfaces ?? []).filter((port) => port.side === 'left')
+)
+const rightPorts = computed(() =>
+  (props.data.interfaces ?? []).filter((port) => port.side !== 'left')
+)
+const portStyle = (index: number) => ({ top: `${8 + index * 10}px` })
 </script>
 
 <template>
@@ -37,19 +46,49 @@ const portStyle = (index: number) => ({ top: `${24 + index * 25}px` })
     <div class="device-meta">{{ data.version || 'Spirent TestCenter' }}</div>
     <div class="device-ip">{{ data.ip || 'No IP configured' }}</div>
 
-    <template v-for="(port, index) in leftPorts" :key="port.guid">
-      <Handle :id="port.guid" type="target" :position="Position.Left" :style="portStyle(index)" connectable="single"
+    <template v-for="(port, index) in leftPorts" :key="port.id">
+      <Handle
+        :id="port.guid"
+        type="target"
+        :position="Position.Left"
+        :style="portStyle(index)"
+        connectable="single"
         @dblclick.stop="emit('port-dblclick', port)"
-        @contextmenu.prevent.stop="emit('port-contextmenu', port, $event, props.id)" />
-      <span class="port-label port-label-left" :style="portStyle(index)" @dblclick.stop="emit('port-dblclick', port)"
-        @contextmenu.prevent.stop="emit('port-contextmenu', port, $event, props.id)">{{ port.name }}</span>
+        @contextmenu.prevent.stop="
+          emit('port-contextmenu', port, $event, props.id)
+        "
+      />
+      <span
+        class="port-label port-label-left"
+        :style="portStyle(index)"
+        @dblclick.stop="emit('port-dblclick', port)"
+        @contextmenu.prevent.stop="
+          emit('port-contextmenu', port, $event, props.id)
+        "
+        >{{ port.name }}</span
+      >
     </template>
-    <template v-for="(port, index) in rightPorts" :key="port.guid">
-      <Handle :id="port.guid" type="source" :position="Position.Right" :style="portStyle(index)" connectable="single"
+    <template v-for="(port, index) in rightPorts" :key="port.id">
+      <Handle
+        :id="port.guid"
+        type="source"
+        :position="Position.Right"
+        :style="portStyle(index)"
+        connectable="single"
         @dblclick.stop="emit('port-dblclick', port)"
-        @contextmenu.prevent.stop="emit('port-contextmenu', port, $event, props.id)" />
-      <span class="port-label port-label-right" :style="portStyle(index)" @dblclick.stop="emit('port-dblclick', port)"
-        @contextmenu.prevent.stop="emit('port-contextmenu', port, $event, props.id)">{{ port.name }}</span>
+        @contextmenu.prevent.stop="
+          emit('port-contextmenu', port, $event, props.id)
+        "
+      />
+      <span
+        class="port-label port-label-right"
+        :style="portStyle(index)"
+        @dblclick.stop="emit('port-dblclick', port)"
+        @contextmenu.prevent.stop="
+          emit('port-contextmenu', port, $event, props.id)
+        "
+        >{{ port.name }}</span
+      >
     </template>
   </div>
 </template>
@@ -67,14 +106,12 @@ const portStyle = (index: number) => ({ top: `${24 + index * 25}px` })
   color: #f2eaff;
   box-shadow: 0 8px 20px rgba(22, 7, 38, 0.35);
 }
-
 .device-title {
   display: flex;
   align-items: center;
   gap: 9px;
   font-weight: 700;
 }
-
 .device-icon {
   display: grid;
   place-items: center;
@@ -85,19 +122,16 @@ const portStyle = (index: number) => ({ top: `${24 + index * 25}px` })
   color: white;
   font-size: 13px;
 }
-
 .device-meta,
 .device-ip {
   margin: 10px 0 0 34px;
   color: #c2a9e8;
   font-size: 11px;
 }
-
 .device-ip {
   margin-top: 5px;
   color: #a989d2;
 }
-
 .port-label {
   position: absolute;
   left: calc(100% + 12px);
@@ -107,19 +141,16 @@ const portStyle = (index: number) => ({ top: `${24 + index * 25}px` })
   cursor: pointer;
   white-space: nowrap;
 }
-
 .port-label-left {
   right: calc(100% + 12px);
   left: auto;
 }
-
 :deep(.vue-flow__handle) {
   width: 8px;
   height: 8px;
   border: 1px solid #ecd9ff;
   background: #b277ff;
 }
-
 :deep(.vue-flow__handle-left) {
   background: #9670c5;
 }
