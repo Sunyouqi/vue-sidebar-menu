@@ -1,67 +1,144 @@
 <script setup lang="ts">
 import { computed, ref, shallowRef, triggerRef } from 'vue'
 import { VueFlow, useVueFlow } from '@vue-flow/core'
-import type { Connection, Edge, EdgeMouseEvent, Node, NodeMouseEvent } from '@vue-flow/core'
 import { v4 as uuidv4 } from 'uuid'
+import { rand } from '../../../use/utils.ts'
+import type {
+  Connection,
+  Edge,
+  EdgeMouseEvent,
+  Node,
+  NodeMouseEvent,
+} from '@vue-flow/core'
 import TopologyNode_ from './TopologyNode_.vue'
 import TestCenterNode from './TestCenterNode.vue'
 
 import '@vue-flow/core/dist/style.css'
 import '@vue-flow/core/dist/theme-default.css'
 
-console.log("uuid:", uuidv4())
-let uid = (uuidv4().replace(/[-]/gi, "a"))
-console.log("uid:", uid)
-
-type DeviceKind = 'switch' | 'testcenter'
-
+type DeviceKind = 'Ne' | 'Atm'
 interface Port {
-  guid: string;
-  name: string;
-  type: string;
-  pid: string;
+  guid: string
+  name: string
+  type: string
+  pid: string
   side: 'left' | 'right'
 }
-
-
 interface NodeData {
-  guid: string;
-  ip: string;
-  position: Number[];
-  objname: string;
-  class: string;
-  protocolPort?: string;
-  username?: string;
-  password?: string;
-  version?: string;
-  interfaces: Port[];
+  guid: string
+  ip: string
+  position: number[]
+  objname: string
+  class: string
+  protocolPort?: string
+  username?: string
+  password?: string
+  version?: string
+  interfaces: Port[]
 }
-
 interface DeviceData {
-  name: string;
-  ip: string;
-  protocolPort?: string;
-  username?: string;
-  password?: string;
-  version?: string;
-  ports: Port[]
+  objname: string
+  ip: string
+  protocolPort?: string
+  username?: string
+  password?: string
+  version?: string
+  interfaces: Port[]
 }
 
 type TopologyNode_ = Node<NodeData>
 
 type TopologyNode = Node<DeviceData>
-type ContextMenu = { x: number; y: number; kind: 'node' | 'port' | 'edge'; nodeId?: string; portId?: string; edgeId?: string }
+type ContextMenu = {
+  x: number
+  y: number
+  kind: 'node' | 'port' | 'edge'
+  nodeId?: string
+  portId?: string
+  edgeId?: string
+}
 
 const nodes_ = shallowRef<TopologyNode_[]>([
-  { id: 'switch-1', type: 'switch', position: { x: 90, y: 150 }, data: { guid: `${uuidv4().replace(/[-]/gi, "a")}`, position: [90, 150, 64, 64], objname: 'Switch instance', class: "switch", ip: '10.0.0.10', protocolPort: '22', username: 'admin', password: '', interfaces: [{ guid: 'ge-1', name: 'GE 1', type: '1G', pid: '1', side: 'right' }, { guid: 'ge-2', name: 'GE 2', type: '1G', pid: '2', side: 'right' }] } },
-  { id: 'testcenter-1', type: 'testcenter', position: { x: 560, y: 150 }, data: { guid: `${uuidv4().replace(/[-]/gi, "a")}`, position: [560, 150, 64, 64], objname: 'Spirent TestCenter', class: "testcenter", ip: '10.0.0.20', version: '5.50', interfaces: [{ guid: 'port-1', name: 'Port 1', type: '10G', pid: '1', side: 'left' }] } },
+  {
+    id: 'switch-1',
+    type: 'Ne',
+    position: { x: 90, y: 150 },
+    data: {
+      guid: `${uuidv4().replace(/[-]/gi, '')}`,
+      position: [90, 150, 64, 64],
+      objname: 'Switch instance',
+      class: 'Ne',
+      ip: '10.0.0.10',
+      protocolPort: '22',
+      username: 'admin',
+      password: '',
+      interfaces: [
+        { guid: 'ge-1', name: 'GE 3', type: '1G', pid: '1', side: 'right' },
+        { guid: 'ge-2', name: 'GE 2', type: '1G', pid: '2', side: 'right' },
+      ],
+    },
+  },
+  {
+    id: 'testcenter-1',
+    type: 'Atm',
+    position: { x: 560, y: 150 },
+    data: {
+      guid: `${uuidv4().replace(/[-]/gi, '')}`,
+      position: [560, 150, 64, 64],
+      objname: 'Spirent TestCenter',
+      class: 'Atm',
+      ip: '10.0.0.20',
+      version: '5.50',
+      interfaces: [
+        {
+          guid: 'port-1',
+          name: 'Port 1',
+          type: '10G',
+          pid: '1',
+          side: 'left',
+        },
+      ],
+    },
+  },
 ])
 
-const nodes = shallowRef<TopologyNode[]>([
-  { id: 'switch-1', type: 'switch', position: { x: 90, y: 150 }, data: { name: 'Core Switch', ip: '10.0.0.10', protocolPort: '22', username: 'admin', password: '', ports: [{ guid: 'ge-1', name: 'GE 1', type: '1G', pid: '1', side: 'right' }, { guid: 'ge-2', name: 'GE 2', type: '1G', pid: '2', side: 'right' }] } },
-  { id: 'testcenter-1', type: 'testcenter', position: { x: 560, y: 150 }, data: { name: 'Spirent TestCenter', ip: '10.0.0.20', version: '5.50', ports: [{ guid: 'port-1', name: 'Port 1', type: '10G', pid: '1', side: 'left' }] } },
-])
-
+/*const nodes = shallowRef<TopologyNode[]>([
+  {
+    id: 'switch-1',
+    type: 'switch',
+    position: { x: 180, y: 150 },
+    data: {
+      objname: 'Core Switch',
+      ip: '10.0.0.10',
+      protocolPort: '22',
+      username: 'admin',
+      password: '',
+      interfaces: [
+        { guid: 'ge-1', name: 'GE 1', type: '1G', pid: '1', side: 'right' },
+        { guid: 'ge-2', name: 'GE 2', type: '1G', pid: '2', side: 'right' },
+      ],
+    },
+  },
+  {
+    id: 'testcenter-1',
+    type: 'testcenter',
+    position: { x: 560, y: 150 },
+    data: {
+      objname: 'Spirent TestCenter',
+      ip: '10.0.0.20',
+      version: '5.50',
+      interfaces: [
+        {
+          guid: 'port-1',
+          name: 'Port 1',
+          type: '10G',
+          pid: '1',
+          side: 'left',
+        },
+      ],
+    },
+  },
+])*/
 
 const edges = shallowRef<Edge[]>([])
 const selectedId = ref<string | null>('switch-1')
@@ -69,13 +146,15 @@ const selectedPort = ref<Port | null>(null)
 const portDraft = ref<Port | null>(null)
 const contextMenu = ref<ContextMenu | null>(null)
 const xmlFileInput = ref<HTMLInputElement | null>(null)
-const { addEdges, screenToFlowCoordinate } = useVueFlow()
+const { addEdges, screenToFlowCoordinate, getEdges } = useVueFlow()
 
 const selectedNode = computed<TopologyNode_ | null>(() => {
   const node = nodes_.value.find((item) => item.id === selectedId.value)
   return node ?? null
 })
-const selectedData = computed<NodeData | undefined>(() => selectedNode.value?.data)
+const selectedData = computed<NodeData | undefined>(
+  () => selectedNode.value?.data
+)
 
 function selectNode(event: NodeMouseEvent) {
   selectedId.value = event.node.id
@@ -86,16 +165,34 @@ function selectNode(event: NodeMouseEvent) {
 function openNodeMenu(event: NodeMouseEvent) {
   selectedId.value = event.node.id
   const mouseEvent = event.event
-  if (mouseEvent instanceof MouseEvent) contextMenu.value = { x: mouseEvent.clientX, y: mouseEvent.clientY, kind: 'node', nodeId: event.node.id }
+  if (mouseEvent instanceof MouseEvent)
+    contextMenu.value = {
+      x: mouseEvent.clientX,
+      y: mouseEvent.clientY,
+      kind: 'node',
+      nodeId: event.node.id,
+    }
 }
 
 function openPortMenu(port: Port, event: MouseEvent, nodeId: string) {
   selectedId.value = nodeId
-  contextMenu.value = { x: event.clientX, y: event.clientY, kind: 'port', nodeId, portId: port.guid }
+  contextMenu.value = {
+    x: event.clientX,
+    y: event.clientY,
+    kind: 'port',
+    nodeId,
+    portId: port.guid,
+  }
 }
 
 function openEdgeMenu(event: EdgeMouseEvent) {
-  if (event.event instanceof MouseEvent) contextMenu.value = { x: event.event.clientX, y: event.event.clientY, kind: 'edge', edgeId: event.edge.id }
+  if (event.event instanceof MouseEvent)
+    contextMenu.value = {
+      x: event.event.clientX,
+      y: event.event.clientY,
+      kind: 'edge',
+      edgeId: event.edge.id,
+    }
 }
 
 function deleteContextItem() {
@@ -103,15 +200,23 @@ function deleteContextItem() {
   if (!menu) return
   if (menu.kind === 'node' && menu.nodeId) {
     nodes_.value = nodes_.value.filter((node) => node.id !== menu.nodeId)
-    edges.value = edges.value.filter((edge) => edge.source !== menu.nodeId && edge.target !== menu.nodeId)
+    edges.value = edges.value.filter(
+      (edge) => edge.source !== menu.nodeId && edge.target !== menu.nodeId
+    )
     if (selectedId.value === menu.nodeId) selectedId.value = null
   } else if (menu.kind === 'edge' && menu.edgeId) {
     edges.value = edges.value.filter((edge) => edge.id !== menu.edgeId)
   } else if (menu.kind === 'port' && menu.nodeId && menu.portId) {
     const node = nodes_.value.find((item) => item.id === menu.nodeId)
-    if (node?.data) node.data.interfaces = node.data.interfaces.filter((interfaces) => interfaces.guid !== menu.portId)
+    if (node?.data)
+      node.data.interfaces = node.data.interfaces.filter(
+        (port) => port.guid !== menu.portId
+      )
     triggerRef(nodes_)
-    edges.value = edges.value.filter((edge) => edge.sourceHandle !== menu.portId && edge.targetHandle !== menu.portId)
+    edges.value = edges.value.filter(
+      (edge) =>
+        edge.sourceHandle !== menu.portId && edge.targetHandle !== menu.portId
+    )
   }
   selectedPort.value = null
   portDraft.value = null
@@ -122,8 +227,40 @@ function closeContextMenu() {
   contextMenu.value = null
 }
 
+function handleConnectable(connection: Connection) {
+  const edges = getEdges.value
+  console.log('edges:', edges)
+  const isSourceOccupied = edges.some(
+    (edge) =>
+      (edge.source === connection.source &&
+        edge.sourceHandle === connection.sourceHandle) ||
+      (edge.target === connection.source &&
+        edge.targetHandle === connection.sourceHandle)
+  )
+  const isTargetOccupied = edges.some(
+    (edge) =>
+      (edge.target === connection.target &&
+        edge.targetHandle === connection.targetHandle) ||
+      (edge.source === connection.target &&
+        edge.sourceHandle === connection.targetHandle)
+  )
+  console.log(
+    'isSourceOccupied:',
+    isSourceOccupied,
+    'isTargetOccupied:',
+    isTargetOccupied
+  )
+  return !isSourceOccupied && !isTargetOccupied
+}
+
 function onConnect(connection: Connection) {
-  if (connection.source && connection.target) addEdges(connection)
+  console.log('onConnect:', connection)
+
+  const connectable = handleConnectable(connection)
+  console.log('connectable:', connection)
+  if (connection.source && connection.target && connectable) {
+    addEdges(connection)
+  }
 }
 
 function dragStart(event: DragEvent, kind: DeviceKind | 'port') {
@@ -134,26 +271,67 @@ function dragStart(event: DragEvent, kind: DeviceKind | 'port') {
 function onDrop(event: DragEvent) {
   const kind = event.dataTransfer?.getData('application/topology-item')
   if (!kind) return
-  const position = screenToFlowCoordinate({ x: event.clientX, y: event.clientY })
+  const position = screenToFlowCoordinate({
+    x: event.clientX,
+    y: event.clientY,
+  })
   if (kind === 'port') {
-    const target = nodes_.value.find((node) => position.x >= node.position.x && position.x <= node.position.x + 250 && position.y >= node.position.y && position.y <= node.position.y + 180)
-    if (target) addPort(target.id, position.x < target.position.x + 125 ? 'left' : 'right')
+    const target = nodes_.value.find(
+      (node) =>
+        position.x >= node.position.x &&
+        position.x <= node.position.x + 250 &&
+        position.y >= node.position.y &&
+        position.y <= node.position.y + 180
+    )
+    if (target)
+      addPort(
+        target.id,
+        position.x < target.position.x + 125 ? 'left' : 'right'
+      )
     return
   }
   const id = `${kind}-${Date.now()}`
-  const data: NodeData = kind === 'switch'
-    ? { guid: `"${uuidv4().replace(/[-]/gi, "a")}"`, position: [], objname: 'New Switch', ip: '', protocolPort: '22', class: "switch", username: '', password: '', interfaces: [] }
-    : { guid: `"${uuidv4().replace(/[-]/gi, "a")}"`, position: [], objname: 'New TestCenter', ip: '', version: '', class: "testcenter", interfaces: [] }
+  const data: NodeData =
+    kind === 'Ne'
+      ? {
+          guid: `${uuidv4().replace(/[-]/gi, '')}`,
+          objname: 'New Switch',
+          ip: '0.0.0.0',
+          position: [rand(0, 1000), rand(0, 800), 64, 64],
+          class: 'Ne',
+          protocolPort: '22',
+          username: '',
+          password: '',
+          interfaces: [],
+        }
+      : {
+          guid: `${uuidv4().replace(/[-]/gi, '')}`,
+          objname: 'New TestCenter',
+          position: [rand(0, 1000), rand(0, 800), 64, 64],
+          class: 'Atm',
+          ip: '',
+          version: '5.03',
+          interfaces: [],
+        }
   nodes_.value = [...nodes_.value, { id, type: kind, position, data }]
   selectedId.value = id
 }
 
 function addPort(nodeId = selectedId.value, side: 'left' | 'right' = 'right') {
   if (!nodeId) return
+  console.log('add_ports')
   const node = nodes_.value.find((item) => item.id === nodeId)
+
   if (!node?.data) return
+  console.log('add_ports', node)
   const number = node.data.interfaces.length + 1
-  node.data.interfaces.push({ guid: `port-${Date.now()}`, name: `Port ${number}`, type: '1G', pid: String(number), side })
+  node.data.interfaces.push({
+    guid: `port-${Date.now()}`,
+    name: `Port ${number}`,
+    type: '1G',
+    pid: String(number),
+    side,
+  })
   triggerRef(nodes_)
 }
 
@@ -170,145 +348,14 @@ function savePort() {
   portDraft.value = null
 }
 
-function escapeXml(value: string | null | undefined) {
-  if (value) {
-    console.log("encoding:", encodeURIComponent(value))
-  }
-
-  return String(value ?? '').replace(/[<>&'"]/g, (character) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' })[character] ?? character)
-}
-
-function saveEnx() {
-  const guid1 = uuidv4();
-  const objguid = uuidv4();
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n
-  <logic_environment>
-    <parameters>
-      <parameter name="guid" value="${guid1}" />
-      <parameter name="remark" value="" />
-      <parameter name="objname" value="${objguid}" />
-      <parameter name="class" value="Env" />
-    </parameters>
-    <devices>
-      <device>
-        <parameters>
-          <parameter name="guid" value="30178c9d566c47fc86f68af703054469" />
-                <parameter name="ip" value="120.108.42.90" />
-                <parameter name="position" value="758.9200000000001,680,64,64" />
-                <parameter name="objname" value="Spirent" />
-                <parameter name="class" value="Atm" />
-                <parameter name="icon" value="Atm" />
-                <parameter name="shape" value="RectFrame" />
-                <parameter name="version" value="" />
-                <parameter name="username" value="" />
-                <parameter name="password" value="" />
-                <parameter name="remark" value="" />
-                <parameter name="type" value="tester" />
-                <parameter name="pypackage" value="" />
-                <parameter name="pyclass" value="" />
-                <parameter name="alias" value="" />
-                <parameter name="caption" value="" />
-                <parameter name="is_topo" value="" />
-                <parameter name="realtype" value="" />
-                <parameter name="shape" value="RectFrame" />
-                <parameter name="fullclass" value="Atm" />
-        </parameters>
-        <devices>
-          <device>
-            <parameters>
-                <parameter name="guid" value="756287fee60c48258708ba4da97c3a35" />
-                <parameter name="objname" value="Port1_tester_to_rta" />
-                <parameter name="class" value="Port" />
-                <parameter name="icon" value="Port" />
-                <parameter name="shape" value="RectFrame" />
-                <parameter name="remark" value="" />
-                <parameter name="ip" value="" />
-                <parameter name="type" value="" />
-                <parameter name="version" value="" />
-                <parameter name="pypackage" value="" />
-                <parameter name="pyclass" value="" />
-                <parameter name="alias" value="" />
-                <parameter name="caption" value="" />
-                <parameter name="is_topo" value="" />
-                <parameter name="realtype" value="" />
-                <parameter name="username" value="" />
-                <parameter name="password" value="" />
-                <parameter name="shape" value="RectFrame" />
-                <parameter name="pid" value="" />
-                <parameter name="fullclass" value="Atm::Port" />
-            </parameters>
-          </device>
-          <device>
-            <parameters>
-                <parameter name="guid" value="bce06d57069e41339dddfc7d733d7a9a" />
-                <parameter name="objname" value="Port3_tester_to_rta" />
-                <parameter name="class" value="Port" />
-                <parameter name="icon" value="Port" />
-                <parameter name="shape" value="RectFrame" />
-                <parameter name="remark" value="" />
-                <parameter name="ip" value="" />
-                <parameter name="type" value="" />
-                <parameter name="version" value="" />
-                <parameter name="pypackage" value="" />
-                <parameter name="pyclass" value="" />
-                <parameter name="alias" value="" />
-                <parameter name="caption" value="" />
-                <parameter name="is_topo" value="" />
-                <parameter name="realtype" value="" />
-                <parameter name="username" value="" />
-                <parameter name="password" value="" />
-                <parameter name="shape" value="RectFrame" />
-                <parameter name="fullclass" value="Atm::Port" />
-            </parameters>
-          </device>
-          <device>
-            <parameters>
-              <parameter name="guid" value="7b3011d1a9644500a9d0a8bdd53d6649" />
-              <parameter name="objname" value="Port6_tester_to_rta" />
-              <parameter name="class" value="Port" />
-              <parameter name="icon" value="Port" />
-              <parameter name="shape" value="RectFrame" />
-              <parameter name="remark" value="" />
-              <parameter name="ip" value="" />
-              <parameter name="type" value="" />
-              <parameter name="version" value="" />
-              <parameter name="pypackage" value="" />
-              <parameter name="pyclass" value="" />
-              <parameter name="alias" value="" />
-              <parameter name="caption" value="" />
-              <parameter name="is_topo" value="" />
-              <parameter name="realtype" value="" />
-              <parameter name="username" value="" />
-              <parameter name="password" value="" />
-              <parameter name="shape" value="RectFrame" />
-              <parameter name="fullclass" value="Atm::Port" />
-            </parameters>
-          </device>
-        </devices>
-      </device>
-      <device>
-        <parameters>
-          <parameter />
-          <parameter />
-          <parameter />
-        </parameters>
-        <devices>
-          <device>
-            <parameters>
-              <parameter />
-              <parameter />
-              <parameter />
-            </parameters>
-          </device>
-        </devices>
-      </device>
-    </devices>
-  <links>
-    <link>
-    
-    </link>
-  </links>
-  </logic_environment>\n`;
+function escapeXml(value: unknown) {
+  return String(value ?? '').replace(
+    /[<>&'"]/g,
+    (character) =>
+      ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', "'": '&apos;', '"': '&quot;' }[
+        character
+      ] ?? character)
+  )
 }
 
 function saveXml() {
@@ -322,6 +369,7 @@ function saveXml() {
       <parameter name="objname" value="${objguid}" />
       <parameter name="class" value="Env" />
     </parameters>
+    <devices>
   ${nodes_.value
     .map((node) => {
       const data = node.data
@@ -347,10 +395,13 @@ function saveXml() {
      </device>\n`
         )
         .join('')
-      const ports_devces = `<devices>\n${ports}</devices>`
-      return `  <devices>\n <device>\n<parameters>\n${attrs}\n</parameters>\n${ports_devces}\n </device>\n </devices>\n`
+      const ports_devices = data.interfaces.length
+        ? `<devices>\n${ports}</devices>`
+        : ``
+      return `<device>\n<parameters>\n${attrs}\n</parameters>\n${ports_devices}\n </device>\n`
     })
     .join('')}
+  </devices>
   ${
     edges.value.length > 0
       ? `<links>
@@ -405,26 +456,46 @@ function loadXml(event: Event) {
 
   const reader = new FileReader()
   reader.onload = () => {
-    const document = new DOMParser().parseFromString(String(reader.result), 'application/xml')
-    if (document.querySelector('parsererror') || document.documentElement.nodeName !== 'topology') {
+    const document = new DOMParser().parseFromString(
+      String(reader.result),
+      'application/xml'
+    )
+    if (
+      document.querySelector('parsererror') ||
+      document.documentElement.nodeName !== 'topology'
+    ) {
       window.alert('The selected file is not a valid topology XML file.')
       return
     }
 
-    const importedNodes: TopologyNode[] = Array.from(document.querySelectorAll(':scope > device')).map((element, index) => {
-      const type = attribute(element, 'type', 'switch') === 'testcenter' ? 'testcenter' : 'switch'
-      const data: DeviceData = {
-        name: attribute(element, 'name', `Imported ${type}`),
+    const importedNodes: TopologyNode_[] = Array.from(
+      document.querySelectorAll(':scope > device')
+    ).map((element, index) => {
+      const type = attribute(element, 'type', 'Ne') === 'Atm' ? 'Atm' : 'Ne'
+      const data: NodeData = {
+        objname: attribute(element, 'objname', `Imported ${type}`),
         ip: attribute(element, 'ip'),
-        ports: Array.from(element.querySelectorAll(':scope > port')).map((port, portIndex) => ({
-          guid: attribute(port, 'id', `${attribute(element, 'id', `device-${index}`)}-port-${portIndex + 1}`),
-          name: attribute(port, 'name', `Port ${portIndex + 1}`),
-          type: attribute(port, 'type', '1G'),
-          pid: attribute(port, 'pid', String(portIndex + 1)),
-          side: attribute(port, 'side', 'right') === 'left' ? 'left' : 'right',
-        })),
+        guid: `${uuidv4()}`,
+        position: [],
+        class: '',
+        interfaces: Array.from(element.querySelectorAll(':scope > port')).map(
+          (port, portIndex) => ({
+            guid: attribute(
+              port,
+              'id',
+              `${attribute(element, 'id', `device-${index}`)}-port-${
+                portIndex + 1
+              }`
+            ),
+            name: attribute(port, 'name', `Port ${portIndex + 1}`),
+            type: attribute(port, 'type', '1G'),
+            pid: attribute(port, 'pid', String(portIndex + 1)),
+            side:
+              attribute(port, 'side', 'right') === 'left' ? 'left' : 'right',
+          })
+        ),
       }
-      if (type === 'switch') {
+      if (type === 'Ne') {
         data.protocolPort = attribute(element, 'protocolPort')
         data.username = attribute(element, 'username')
         data.password = attribute(element, 'password')
@@ -441,22 +512,27 @@ function loadXml(event: Event) {
         data,
       }
     })
-    const importedEdges: Edge[] = Array.from(document.querySelectorAll(':scope > edge')).map((element, index) => ({
-      id: attribute(element, 'id', `edge-${index + 1}`),
-      source: attribute(element, 'source'),
-      sourceHandle: attribute(element, 'sourceHandle') || undefined,
-      target: attribute(element, 'target'),
-      targetHandle: attribute(element, 'targetHandle') || undefined,
-    })).filter((edge) => edge.source && edge.target)
+    const importedEdges: Edge[] = Array.from(
+      document.querySelectorAll(':scope > edge')
+    )
+      .map((element, index) => ({
+        id: attribute(element, 'id', `edge-${index + 1}`),
+        source: attribute(element, 'source'),
+        sourceHandle: attribute(element, 'sourceHandle') || undefined,
+        target: attribute(element, 'target'),
+        targetHandle: attribute(element, 'targetHandle') || undefined,
+      }))
+      .filter((edge) => edge.source && edge.target)
 
-    nodes.value = importedNodes
+    nodes_.value = importedNodes
     edges.value = importedEdges
     selectedId.value = importedNodes[0]?.id ?? null
     selectedPort.value = null
     portDraft.value = null
     contextMenu.value = null
   }
-  reader.onerror = () => window.alert('The topology XML file could not be read.')
+  reader.onerror = () =>
+    window.alert('The topology XML file could not be read.')
   reader.readAsText(file)
 }
 
@@ -473,77 +549,166 @@ function onCanvasDragOver(event: DragEvent) {
       <h1>Network lab</h1>
       <p class="muted">Drag equipment and ports onto the canvas.</p>
       <div class="menu-label">EQUIPMENT</div>
-      <div class="palette-card" draggable="true" @dragstart="dragStart($event, 'switch')"><span
-          class="palette-icon switch">S</span><span><strong>Switch</strong><small>Network device</small></span><span
-          class="drag-grip">⋮⋮</span></div>
-      <div class="palette-card" draggable="true" @dragstart="dragStart($event, 'testcenter')"><span
-          class="palette-icon testcenter">T</span><span><strong>Spirent TestCenter</strong><small>Traffic
-            generator</small></span><span class="drag-grip">⋮⋮</span></div>
+      <div
+        class="palette-card"
+        draggable="true"
+        @dragstart="dragStart($event, 'Ne')"
+      >
+        <span class="palette-icon Ne">S</span
+        ><span><strong>Switch</strong><small>Network device</small></span
+        ><span class="drag-grip">⋮⋮</span>
+      </div>
+      <div
+        class="palette-card"
+        draggable="true"
+        @dragstart="dragStart($event, 'Atm')"
+      >
+        <span class="palette-icon Atm">T</span
+        ><span
+          ><strong>Spirent TestCenter</strong
+          ><small>Traffic generator</small></span
+        ><span class="drag-grip">⋮⋮</span>
+      </div>
       <div class="menu-label">PORTS</div>
-      <div class="palette-card port-card" draggable="true" @dragstart="dragStart($event, 'port')"><span
-          class="port-dot"></span><span><strong>Network port</strong><small>Drop on a device</small></span><span
-          class="drag-grip">⋮⋮</span></div>
-      <div class="legend"><span class="legend-dot connected"></span> Connected <span
-          class="legend-dot available"></span> Available</div>
+      <div
+        class="palette-card port-card"
+        draggable="true"
+        @dragstart="dragStart($event, 'port')"
+      >
+        <span class="port-dot"></span
+        ><span
+          ><strong>Network port</strong><small>Drop on a device</small></span
+        ><span class="drag-grip">⋮⋮</span>
+      </div>
+      <div class="legend">
+        <span class="legend-dot connected"></span> Connected
+        <span class="legend-dot available"></span> Available
+      </div>
     </aside>
 
-    <main class="canvas-area" @drop="onDrop" @dragover="onCanvasDragOver" @click="closeContextMenu">
-      <div class="canvas-toolbar"><span class="status-dot"></span><span>Unsaved topology</span><span
-          class="toolbar-hint">Drag to pan · Scroll to zoom</span></div>
-      <VueFlow v-model:nodes="nodes_" v-model:edges="edges" :default-viewport="{ zoom: 0.9, x: 30, y: 30 }"
-        fit-view-on-init @connect="onConnect" @node-click="selectNode" @node-context-menu="openNodeMenu"
-        @edge-context-menu="openEdgeMenu">
-        <template #node-switch="props">
-          <TopologyNode_ v-bind="props" @port-dblclick="editPort" @port-contextmenu="openPortMenu" />
-        </template>
-        <template #node-testcenter="props">
-          <TestCenterNode v-bind="props" @port-dblclick="editPort" @port-contextmenu="openPortMenu" />
-        </template>
+    <main
+      class="canvas-area"
+      @drop="onDrop"
+      @dragover="onCanvasDragOver"
+      @click="closeContextMenu"
+    >
+      <div class="canvas-toolbar">
+        <span class="status-dot"></span><span>Unsaved topology</span
+        ><span class="toolbar-hint">Drag to pan · Scroll to zoom</span>
+      </div>
+      <VueFlow
+        v-model:nodes="nodes_"
+        v-model:edges="edges"
+        :default-viewport="{ zoom: 0.9, x: 30, y: 30 }"
+        fit-view-on-init
+        @connect="onConnect"
+        @node-click="selectNode"
+        @node-context-menu="openNodeMenu"
+        @edge-context-menu="openEdgeMenu"
+      >
+        <template #node-Ne="props"
+          ><TopologyNode_
+            v-bind="props"
+            @port-dblclick="editPort"
+            @port-contextmenu="openPortMenu"
+        /></template>
+        <template #node-Atm="props"
+          ><TestCenterNode
+            v-bind="props"
+            @port-dblclick="editPort"
+            @port-contextmenu="openPortMenu"
+        /></template>
       </VueFlow>
-      <div v-if="contextMenu" class="context-menu" :style="{ left: `${contextMenu.x}px`, top: `${contextMenu.y}px` }"
-        @click.stop>
-        <button @click="deleteContextItem">Delete {{ contextMenu.kind }}</button>
+      <div
+        v-if="contextMenu"
+        class="context-menu"
+        :style="{ left: `${contextMenu.x}px`, top: `${contextMenu.y}px` }"
+        @click.stop
+      >
+        <button @click="deleteContextItem">
+          Delete {{ contextMenu.kind }}
+        </button>
       </div>
     </main>
 
     <aside class="right-panel">
-      <input ref="xmlFileInput" class="file-input" type="file" accept=".xml,application/xml,text/xml"
-        @change="loadXml" />
+      <input
+        ref="xmlFileInput"
+        class="file-input"
+        type="file"
+        accept=".xml,application/xml,text/xml"
+        @change="loadXml"
+      />
       <div class="inspector-header">
         <div>
           <div class="eyebrow">INSPECTOR</div>
           <h2>{{ selectedData?.objname || 'No selection' }}</h2>
         </div>
-        <div class="inspector-actions"><button class="icon-button" title="Open topology XML"
-            @click="openXmlPicker">↑</button><button class="icon-button" title="Save topology as XML"
-            @click="saveXml">↓</button></div>
+        <div class="inspector-actions">
+          <button
+            class="icon-button"
+            title="Open topology XML"
+            @click="openXmlPicker"
+          >
+            ↑</button
+          ><button
+            class="icon-button"
+            title="Save topology as XML"
+            @click="saveXml"
+          >
+            ↓
+          </button>
+        </div>
       </div>
       <div v-if="selectedData && !selectedPort" class="form">
         <label>Name<input v-model="selectedData.objname" /></label>
-        <label>IP address<input v-model="selectedData.ip" placeholder="192.168.1.10" /></label>
-        <template v-if="selectedNode?.type === 'switch'">
-          <label>Protocol port<input v-model="selectedData.protocolPort" /></label>
+        <label
+          >IP address<input
+            v-model="selectedData.ip"
+            placeholder="192.168.1.10"
+        /></label>
+        <template v-if="selectedNode?.type === 'Ne'">
+          <label
+            >Protocol port<input v-model="selectedData.protocolPort"
+          /></label>
           <label>Login username<input v-model="selectedData.username" /></label>
-          <label>Password<input v-model="selectedData.password" type="password" /></label>
+          <label
+            >Password<input v-model="selectedData.password" type="password"
+          /></label>
         </template>
-        <label v-else>Version<input v-model="selectedData.version" placeholder="5.50" /></label>
+        <label v-else
+          >Version<input v-model="selectedData.version" placeholder="5.50"
+        /></label>
         <button class="add-button" @click="addPort()">＋ Add port</button>
       </div>
       <div v-else-if="selectedPort && portDraft" class="form">
         <div class="section-title">EDIT PORT</div>
         <label>Interface name<input v-model="portDraft.name" /></label>
-        <label>Interface type<input v-model="portDraft.type" placeholder="10G" /></label>
+        <label
+          >Interface type <input v-model="portDraft.type" placeholder="10G"
+        /></label>
         <label>PID / port ID<input v-model="portDraft.pid" /></label>
-        <div class="button-row"><button class="ghost-button" @click="selectedPort = null">Cancel</button><button
-            class="save-button" @click="savePort">Save port</button></div>
+        <div class="button-row">
+          <button class="ghost-button" @click="selectedPort = null">
+            Cancel</button
+          ><button class="save-button" @click="savePort">Save port</button>
+        </div>
       </div>
-      <div v-else class="empty-state">Select a device to edit its connection details.</div>
+      <div v-else class="empty-state">
+        Select a device to edit its connection details.
+      </div>
       <div class="save-box">
-        <div><strong>Import or export topology</strong>
+        <div>
+          <strong>Import or export topology</strong>
           <p>Open a saved XML file or save the current canvas for later.</p>
         </div>
-        <div class="export-actions"><button class="open-button" @click="openXmlPicker">Open XML
-            <span>↥</span></button><button class="export-button" @click="saveXml">Save XML <span>↗</span></button></div>
+        <div class="export-actions">
+          <button class="open-button" @click="openXmlPicker">
+            Open XML <span>↥</span></button
+          ><button class="export-button" @click="saveXml">
+            Save XML <span>↗</span>
+          </button>
+        </div>
       </div>
     </aside>
   </div>
@@ -553,53 +718,45 @@ function onCanvasDragOver(event: DragEvent) {
 .topology-shell {
   display: grid;
   grid-template-columns: 248px 1fr 292px;
-  height: 100vh;
+  height: 70vh;
   overflow: hidden;
   background: #0b1424;
   color: #dce8fa;
   font: 13px Inter, ui-sans-serif, system-ui, sans-serif;
 }
-
 .left-panel,
 .right-panel {
   background: #101d31;
   padding: 28px 20px;
   z-index: 2;
 }
-
 .left-panel {
   border-right: 1px solid #1e3150;
 }
-
 .right-panel {
   border-left: 1px solid #1e3150;
 }
-
 .eyebrow,
 .menu-label,
 .section-title {
   color: #7088aa;
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: .14em;
+  letter-spacing: 0.14em;
 }
-
 .menu-label {
   margin: 30px 0 10px;
 }
-
 h1 {
   margin: 7px 0;
   font-size: 21px;
-  letter-spacing: -.03em;
+  letter-spacing: -0.03em;
 }
-
 .muted {
   margin: 0;
   color: #7187a7;
   line-height: 1.5;
 }
-
 .palette-card {
   display: flex;
   align-items: center;
@@ -612,26 +769,21 @@ h1 {
   background: #152642;
   cursor: grab;
 }
-
 .palette-card:active {
   cursor: grabbing;
 }
-
 .palette-card strong,
 .palette-card small {
   display: block;
 }
-
 .palette-card strong {
   font-size: 12px;
 }
-
 .palette-card small {
   margin-top: 4px;
   color: #7890b2;
   font-size: 10px;
 }
-
 .palette-icon {
   display: grid;
   place-items: center;
@@ -640,21 +792,17 @@ h1 {
   border-radius: 8px;
   font-weight: 700;
 }
-
-.palette-icon.switch {
+.palette-icon.Ne {
   background: #3472d9;
 }
-
-.palette-icon.testcenter {
+.palette-icon.Atm {
   background: #8e58c2;
 }
-
 .drag-grip {
   margin-left: auto;
   color: #627a9c;
   letter-spacing: -4px;
 }
-
 .port-dot,
 .legend-dot {
   width: 10px;
@@ -663,17 +811,14 @@ h1 {
   background: #4f8cff;
   box-shadow: 0 0 0 3px #234371;
 }
-
 .port-card {
   min-height: 45px;
 }
-
 .port-card .port-dot {
   width: 8px;
   height: 8px;
   box-shadow: 0 0 0 2px #234371;
 }
-
 .legend {
   display: flex;
   align-items: center;
@@ -682,26 +827,23 @@ h1 {
   color: #748bab;
   font-size: 10px;
 }
-
 .legend-dot {
   width: 6px;
   height: 6px;
   box-shadow: none;
   margin-left: 6px;
 }
-
 .legend-dot.available {
   background: #6a7b94;
 }
-
 .canvas-area {
   position: relative;
   min-width: 0;
   background-color: #0c1729;
-  background-image: linear-gradient(#182942 1px, transparent 1px), linear-gradient(90deg, #182942 1px, transparent 1px);
+  background-image: linear-gradient(#182942 1px, transparent 1px),
+    linear-gradient(90deg, #182942 1px, transparent 1px);
   background-size: 24px 24px;
 }
-
 .canvas-toolbar {
   position: absolute;
   top: 18px;
@@ -713,19 +855,16 @@ h1 {
   color: #8298b8;
   font-size: 11px;
 }
-
 .status-dot {
   width: 7px;
   height: 7px;
   border-radius: 50%;
   background: #e6aa54;
 }
-
 .toolbar-hint {
   margin-left: 18px;
   color: #536b8d;
 }
-
 .context-menu {
   position: fixed;
   z-index: 20;
@@ -734,9 +873,8 @@ h1 {
   border: 1px solid #315174;
   border-radius: 8px;
   background: #172b49;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, .35);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
 }
-
 .context-menu button {
   width: 100%;
   border: 0;
@@ -748,32 +886,25 @@ h1 {
   font: inherit;
   cursor: pointer;
 }
-
 .context-menu button:hover {
   background: #a94355;
 }
-
 .vue-flow {
   background: #0c1729;
 }
-
 .vue-flow__edge-path {
   stroke: #6f9ddd;
   stroke-width: 2;
 }
-
 .vue-flow__edge.selected .vue-flow__edge-path {
   stroke: #b277ff;
 }
-
-.vue-flow__node.selected>div {
-  box-shadow: 0 0 0 2px #72a9ff, 0 8px 20px rgba(3, 12, 29, .32);
+.vue-flow__node.selected > div {
+  box-shadow: 0 0 0 2px #72a9ff, 0 8px 20px rgba(3, 12, 29, 0.32);
 }
-
 .file-input {
   display: none;
 }
-
 .inspector-header {
   display: flex;
   justify-content: space-between;
@@ -781,7 +912,6 @@ h1 {
   padding-bottom: 22px;
   border-bottom: 1px solid #203552;
 }
-
 .inspector-header h2 {
   max-width: 195px;
   margin: 8px 0 0;
@@ -790,12 +920,10 @@ h1 {
   font-size: 17px;
   white-space: nowrap;
 }
-
 .inspector-actions {
   display: flex;
   gap: 6px;
 }
-
 .icon-button {
   width: 32px;
   height: 32px;
@@ -806,20 +934,17 @@ h1 {
   font-size: 18px;
   cursor: pointer;
 }
-
 .form {
   display: grid;
   gap: 14px;
   padding-top: 22px;
 }
-
 .form label {
   display: grid;
   gap: 7px;
   color: #8197b7;
   font-size: 11px;
 }
-
 .form input {
   width: 100%;
   box-sizing: border-box;
@@ -831,11 +956,9 @@ h1 {
   color: #e0ebfb;
   font: inherit;
 }
-
 .form input:focus {
   border-color: #548ce1;
 }
-
 .add-button,
 .save-button,
 .export-button {
@@ -847,18 +970,15 @@ h1 {
   font-weight: 600;
   cursor: pointer;
 }
-
 .add-button {
   margin-top: 5px;
   background: #1b3558;
   color: #9fc5f8;
 }
-
 .button-row {
   display: flex;
   gap: 8px;
 }
-
 .ghost-button {
   border: 1px solid #2c4668;
   border-radius: 7px;
@@ -867,40 +987,33 @@ h1 {
   color: #9eb4d2;
   cursor: pointer;
 }
-
 .save-button {
   flex: 1;
 }
-
 .empty-state {
   padding-top: 25px;
   color: #7187a7;
   line-height: 1.5;
 }
-
 .save-box {
   margin-top: auto;
   padding-top: 22px;
   border-top: 1px solid #203552;
 }
-
 .save-box strong {
   font-size: 12px;
 }
-
 .save-box p {
   margin: 7px 0 14px;
   color: #7187a7;
   font-size: 11px;
   line-height: 1.5;
 }
-
 .export-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
 }
-
 .open-button,
 .export-button {
   width: 100%;
@@ -913,13 +1026,11 @@ h1 {
   font: inherit;
   cursor: pointer;
 }
-
 .export-button {
   border: 0;
   background: #3477dc;
   color: white;
 }
-
 .open-button span,
 .export-button span {
   float: right;
