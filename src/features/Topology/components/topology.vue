@@ -312,9 +312,9 @@ function saveEnx() {
 }
 
 function saveXml() {
-  console.log("!!!!!!!!", edges.value.length)
-  const guid1 = uuidv4();
-  const objguid = uuidv4();
+  console.log('!!!!!!!!', edges.value.length)
+  const guid1 = uuidv4()
+  const objguid = uuidv4()
   const xml = `<logic_environment>
     <parameters>
       <parameter name="guid" value="${guid1}" />
@@ -322,38 +322,59 @@ function saveXml() {
       <parameter name="objname" value="${objguid}" />
       <parameter name="class" value="Env" />
     </parameters>
-  ${nodes_.value.map((node) => {
-    const data = node.data
-    if (!data) return ''
-    const attrs = Object.entries(data).filter(([key]) => key !== 'interfaces').map(([key, value]) => `<parameter ${key}="${escapeXml(value)}" />`).join('\n')
-    const ports = data.interfaces.map((interfaces) =>
-      `<device>
+  ${nodes_.value
+    .map((node) => {
+      const data = node.data
+      if (!data) return ''
+      const attrs = Object.entries(data)
+        .filter(([key]) => key !== 'interfaces')
+        .map(
+          ([key, value]) =>
+            `<parameter name="${key}" value="${escapeXml(value)}" />`
+        )
+        .join('\n')
+      const ports = data.interfaces
+        .map(
+          (interfaces) =>
+            `<device>
       <parameters>
-        <parameter name="guid" value="${(interfaces.guid)}" />
-        <parameter name="${escapeXml(interfaces.name)}" />
-        <parameter type="${escapeXml(interfaces.type)}" />
-        <parameter pid="${escapeXml(interfaces.pid)}" />
-        <parameter side="${escapeXml(interfaces.side)}" />
+        <parameter name="guid" value="${interfaces.guid}" />
+        <parameter name="name" value="${escapeXml(interfaces.name)}" />
+        <parameter name="type" value="${escapeXml(interfaces.type)}" />
+        <parameter name="pid" value="${escapeXml(interfaces.pid)}" />
+        <parameter name="side" value="${escapeXml(interfaces.side)}" />
       </parameters>
-     </device>\n`).join('')
-    const ports_devces = `<devices>\n${ports}</devices>`;
-    return `  <devices>\n <device>\n<parameters>\n${attrs}\n</parameters>\n${ports_devces}\n </device>\n </devices>\n`
-  }).join('')}
-  ${edges.value.length > 0 ? (`<links>
-  ${edges.value.map((edge) => `<link>
+     </device>\n`
+        )
+        .join('')
+      const ports_devces = `<devices>\n${ports}</devices>`
+      return `  <devices>\n <device>\n<parameters>\n${attrs}\n</parameters>\n${ports_devces}\n </device>\n </devices>\n`
+    })
+    .join('')}
+  ${
+    edges.value.length > 0
+      ? `<links>
+  ${edges.value
+    .map(
+      (edge) => `<link>
   <parameter name="guid" value="${escapeXml(edge.id)}" />
   <parameter name="remark" value="" />
-  <parameter name="objgname" value="${edge.sourceHandle}_${edge.targetHandle}" />
-  <parameter name="sourcetopdevicename" value="${escapeXml(edge.source)}" /> // need to refactor into sourcetopdevicename
-  <parameter name="sourcedeviceid" value="${escapeXml(edge.sourceHandle)}" />  // need to refactor into sourcedeviceid
-  <parameter name="targettopdevicename" value="${escapeXml(edge.target)}" />  // need to refactor into targettopdevicename
-  <parameter name="targetdeviceid" value="${escapeXml(edge.targetHandle)}" /> // need to refactor into targetdeviceid
-  <parameter name="class" value="Connect" /> 
-  <parameter name="position" value=";" /> 
-  </link>\n `).join('')}`) : "<links>"}
+  <parameter name="objgname" value="${edge.sourceHandle}_${
+        edge.targetHandle
+      }" />
+  <parameter name="sourcetopdevicename" value="${escapeXml(edge.source)}" />
+  <parameter name="sourcedeviceid" value="${escapeXml(edge.sourceHandle)}" />
+  <parameter name="targettopdevicename" value="${escapeXml(edge.target)}" />
+  <parameter name="targetdeviceid" value="${escapeXml(edge.targetHandle)}" />
+  <parameter name="class" value="Connect" />
+  <parameter name="position" value=";" />
+  </link>\n `
+    )
+    .join('')}`
+      : '<links>'
+  }
   </links>
   </logic_environment>\n`
-
 
   const url = URL.createObjectURL(new Blob([xml], { type: 'application/xml' }))
   const anchor = document.createElement('a')
